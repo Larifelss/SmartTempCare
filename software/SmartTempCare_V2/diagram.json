@@ -1,0 +1,52 @@
+{
+  "version": 1,
+  "author": "Lari Felss",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -192, "left": 254.44, "attrs": {} },
+    {
+      "type": "wokwi-ntc-temperature-sensor",
+      "id": "ntc1",
+      "top": 69.8,
+      "left": 249,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": -324,
+      "left": 280.2,
+      "attrs": { "volume": "0.1" }
+    },
+    {
+      "type": "board-ssd1306",
+      "id": "oled1",
+      "top": -83.26,
+      "left": 77.03,
+      "attrs": { "i2cAddress": "0x3c" }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": -310.8,
+      "left": 435.8,
+      "attrs": { "color": "red" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "ntc1:VCC", "esp:3V3", "red", [ "h57.6", "v-172.8" ] ],
+    [ "ntc1:GND", "esp:GND.1", "black", [ "h48", "v-38.4" ] ],
+    [ "ntc1:OUT", "esp:VP", "yellow", [ "h76.8", "v-163.3" ] ],
+    [ "bz1:2", "esp:16", "red", [ "h66.8", "v182.4" ] ],
+    [ "bz1:1", "esp:GND.2", "black", [ "v28.8", "h67.2", "v48" ] ],
+    [ "oled1:SDA", "esp:21", "green", [ "v0" ] ],
+    [ "oled1:SCL", "esp:22", "green", [ "v0" ] ],
+    [ "oled1:GND", "esp:GND.2", "black", [ "v0" ] ],
+    [ "oled1:VCC", "esp:5V", "red", [ "v-144", "h364.95" ] ],
+    [ "led1:C", "esp:GND.1", "black", [ "v0" ] ],
+    [ "led1:A", "esp:26", "green", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
