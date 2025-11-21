@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "author": "Lari Felss",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "board-esp32-devkit-c-v4", "id": "esp", "top": -192, "left": 254.44, "attrs": {} },
+    {
+      "type": "wokwi-ntc-temperature-sensor",
+      "id": "ntc1",
+      "top": -26.2,
+      "left": -0.6,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "bz1",
+      "top": -324,
+      "left": 280.2,
+      "attrs": { "volume": "0.1" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX", "$serialMonitor:TX", "", [] ],
+    [ "ntc1:VCC", "esp:3V3", "red", [ "h57.6", "v-172.8" ] ],
+    [ "ntc1:GND", "esp:GND.1", "black", [ "h48", "v-38.4" ] ],
+    [ "ntc1:OUT", "esp:VP", "yellow", [ "h76.8", "v-163.3" ] ],
+    [ "bz1:2", "esp:16", "green", [ "h66.8", "v182.4" ] ],
+    [ "bz1:1", "esp:GND.2", "green", [ "v28.8", "h67.2", "v48" ] ]
+  ],
+  "dependencies": {}
+}
