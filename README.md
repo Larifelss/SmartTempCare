@@ -1,78 +1,93 @@
-# README – SmartTempCare – Monitoramento de Temperatura Corporal via IoT (ESP32 + NTC + MQTT)
+# README – SmartTempCare – Monitoramento de Temperatura Corporal via IoT (ESP32 + NTC + OLED + LED + MQTT)
 
-# Visão Geral do Projeto
+## Visão Geral do Projeto
+O SmartTempCare é um sistema IoT desenvolvido para monitorar temperatura corporal em tempo real, utilizando um ESP32, sensor NTC, display OLED, LED de alerta e buzzer. O dispositivo detecta febre, exibe informações no display e envia os dados para a nuvem via MQTT.
 
-O SmartTempCare é um protótipo IoT voltado ao monitoramento de temperatura corporal em tempo real, utilizando um ESP32, um sensor NTC (como substituto simulado do MAX30205) e um buzzer piezoelétrico para alertas locais.
+Este projeto foi totalmente simulado no Wokwi e utiliza o broker público **test.mosquitto.org**.
 
-O objetivo é simular um dispositivo capaz de:
+---
 
-Monitorar sinais vitais relacionados à temperatura corporal.
-Detectar estados febris de forma automática.
-Emitir alerta sonoro imediato.
-Transmitir dados via MQTT para monitoramento remoto.
-Permitir controle do buzzer via comandos MQTT.
+## Componentes Utilizados
+- **ESP32 DevKit V1** – Microcontrolador principal
+- **Sensor NTC (simulado)** – Leitura de temperatura
+- **Display OLED SSD1306 (I2C)** – Exibição de temperatura e status
+- **LED Vermelho (GPIO 26)** – Indicação visual de febre
+- **Buzzer (GPIO 16)** – Alerta sonoro
+- **Broker MQTT (test.mosquitto.org)** – Comunicação de dados
+- **Simulador Wokwi** – Ambiente de desenvolvimento
 
-O projeto foi desenvolvido e testado integralmente na plataforma de simulação Wokwi, alinhando-se ao ODS 3: Saúde e Bem-estar.
+---
 
-# Componentes Utilizados (Simulados)
+## Ligações dos Componentes
+### Sensor NTC
+| NTC | ESP32 |
+|-----|--------|
+| S   | GPIO 36 |
+| +   | 3.3V |
+| –   | GND |
 
-| Componente                         | Função                                                                   |
-| ---------------------------------- | ------------------------------------------------------------------------ |
-| ESP32 DevKit V1                    | Microcontrolador com Wi-Fi integrado, responsável por processar os dados |
-| NTC Temperature Sensor (analógico) | Simula o sensor corporal para medir temperatura                          |
-| Buzzer piezoelétrico               | Atuador utilizado para emitir alerta sonoro em caso de febre             |
-| Wokwi IoT Simulator                | Ambiente online para simulação do ESP32, sensores e atuadores            |
-| Broker MQTT (Mosquitto)            | Responsável por receber as mensagens publicadas pelo ESP32               |
-
-# Esquema da Montagem
-
-Ligações do Sensor NTC ao ESP32
-
-| NTC        | ESP32        |
-| ---------- | ------------ |
-| S (Signal) | GPIO 36 (VP) |
-| + (VCC)    | 3.3V         |
-| – (GND)    | GND          |
-
-# Ligações do Buzzer
-
-| Buzzer | ESP32   |
-| ------ | ------- |
+### Buzzer
+| Buzzer | ESP32 |
+|--------|--------|
 | +      | GPIO 16 |
-| –      | GND     |
+| –      | GND |
 
-# Comunicação MQTT
+### LED de Alerta
+| LED | ESP32 |
+|-----|--------|
+| +   | GPIO 26 |
+| –   | GND |
 
-O ESP32 publica as leituras de temperatura corporal e recebe comandos para controle remoto do buzzer.
+### Display OLED (SSD1306 – I2C)
+| OLED | ESP32 |
+|------|--------|
+| SDA  | GPIO 21 |
+| SCL  | GPIO 22 |
+| VCC  | 3.3V |
+| GND  | GND |
 
-Broker utilizado
-Broker: test.mosquitto.org
-Porta: 1883
+---
 
-# Tópicos MQTT
+## Funcionamento do Sistema
+1. Conecta ao Wi-Fi **Wokwi-GUEST**.
+2. Inicializa o display OLED.
+3. Conecta ao broker MQTT.
+4. Lê continuamente o valor analógico do sensor NTC.
+5. Converte o ADC em temperatura (°C) utilizando um mapa calibrado.
+6. Verifica febre (temperatura > **37,5°C**):
+   - Acende o LED vermelho.
+   - Emite um bip rápido usando o buzzer.
+7. Atualiza o display OLED com a temperatura atual e status (normal/febre).
+8. Envia a temperatura via MQTT a cada **2 segundos**.
 
-| Tipo       | Tópico                    | Função                                 |
-| ---------- | ------------------------- | -------------------------------------- |
-| Publicação | smarttempcare/temperatura | Envia leituras de temperatura corporal |
-| Assinatura | smarttempcare/comandos    | Recebe comandos de controle do buzzer  |
+---
 
-# Comandos válidos
+## Tópico MQTT Utilizado
+| Tipo | Tópico | Função |
+|------|--------|--------|
+| Publicação | `temperatura/valor` | Envia temperatura em °C |
 
-| Comando    | Ação             |
-| ---------- | ---------------- |
-| BUZZER_ON  | Liga o buzzer    |
-| BUZZER_OFF | Desliga o buzzer |
+---
 
-# Funcionamento do Sistema
+## Principais Constantes do Código
+- `TEMPERATURA_ALERTA_C = 37.5`
+- `sensorPin = 36`
+- `buzzerPin = 16`
+- `ledPin = 26`
+- `DELAY_PUBLISH_MS = 2000`
+- Servidor MQTT: **test.mosquitto.org**
 
-O sistema simula leituras entre 36°C e 40°C, faixa equivalente à temperatura corporal humana.
+---
 
-Fluxo geral do funcionamento:
+## Lógica Geral
+- Ler temperatura
+- Atualizar display OLED
+- Acionar alerta (LED + buzzer) quando necessário
+- Publicar temperatura via MQTT
+- Garantir reconexão automática ao Wi-Fi e MQTT
 
-1. O ESP32 lê o valor analógico do sensor NTC.
-2. Converte esse valor para graus Celsius.
-3. Caso a temperatura ultrapasse 37,5°C, o buzzer é ativado automaticamente.
-4. A cada 5 segundos, a temperatura é publicada no tópico MQTT configurado.
-5. O buzzer pode ser acionado ou desligado remotamente por comandos MQTT enviados ao tópico correspondente.
+---
 
-Esse fluxo simula o funcionamento de dispositivos de monitoramento corporal utilizados em cuidados domiciliares, clínicas e sistemas de telemedicina.
+## Objetivo do Projeto
+Simular um termômetro inteligente com alerta local e envio remoto de dados, aplicável em ambientes clínicos, domésticos ou acadêmicos. O sistema serve como base para projetos IoT de saúde, monitoramento contínuo e telemedicina.
+
